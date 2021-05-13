@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>3D viewer</title>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../static/main.css">
+  <link rel>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r127/three.min.js'></script>
+  <script src='https://threejs.org/examples/js/controls/TrackballControls.js'></script>
+  <script src='https://mamboleoo.be/learnThree/demos/OBJLoader.js'></script>
+  <style>
+  canvas{
+  width:100%;
+  height:100%
+  } 
+  </style>
+  <script>
+    
+  </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-8">
+                <h1>Construction Schedule Feature</h1>
+                <table class="table table-dark table-bordered">
+                <thead class = "thead-dark">
+                    <tr>
+                    <th>Task</th>
+                    <th>Start Day</th>
+                    <th>End Day</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Column 1</td>
+                        <td>0</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Column 2</td>
+                        <td>3</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Column 3</td>
+                        <td>5</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td>Column 4</td>
+                        <td>9</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>Slab</td>
+                        <td>12</td>
+                        <td>15</td>
+                    </tr>
+                </tbody>
+                </table>
+
+            </div>
+            <div class = "col-sm-4">
+                <canvas id="c" style="width:80%"></canvas>
+				<input type="range" min="0" max="16" value="0" id="slider">
+				<div id="sliderValue">Day: 0</div>
+                <script type = "module">
+				
+					var canvas = document.getElementById('c');
+					
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+				
+                    let scene, camera, renderer;
+                    
+                      import * as THREE from '../static/three.module.js';
+                      import { OBJLoader } from './static/OBJLoader.js';
+					
+                  
+                      scene = new THREE.Scene();
+                      scene.background = new THREE.Color(0x505050);
+                      camera = new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight);
+                      camera.position.set(10, 80, 100);
+					  
+					  
+					  
+						const material = {
+							color:"white",wireframe: false,
+							opacity: 0.50,
+							transparent: true,
+							alphaTest: 0.05
+						};
+                      var mesh = new THREE.MeshBasicMaterial({transparent:true});
+						canvas = document.getElementById('c')
+                      renderer = new THREE.WebGLRenderer({canvas});
+                      renderer.setSize(500,500);
+                      
+                      const manager = new THREE.LoadingManager()
+					  var saveobject;
+                      new OBJLoader( manager )
+                          .load( '../static/model.obj', function (object) {
+                          object.position.y = 80;
+						  object.position.z = -4;
+						  object.position.x = 10;
+                          object.scale.set(10,10,10);
+						  //mesh.opacity = 0.5;
+						  object.children[0].material = new THREE.MeshPhongMaterial(material);
+						  object.children[1].material = new THREE.MeshPhongMaterial(material);
+						  object.children[2].material = new THREE.MeshPhongMaterial(material);
+						  object.children[3].material = new THREE.MeshPhongMaterial(material);
+						  object.children[4].material = new THREE.MeshPhongMaterial(material);
+                          scene.add( object );
+						console.log(object);
+						console.log(object);
+                      saveobject =  object;
+					  });
+					  
+					  
+
+					  var slide = document.getElementById("slider");
+					  slide.addEventListener("input", function(){
+								
+								document.getElementById("sliderValue").innerHTML = "Day:"+slide.value;
+								console.log(slide.value);
+						     saveobject.traverse( function ( child ) {
+                             if ( child instanceof THREE.Mesh ) {
+                                  
+								  child.material = new THREE.MeshPhongMaterial({color:"white",wireframe: false,
+									opacity: 0.50,
+									transparent: true,
+									alphaTest: 0.05});
+								  if(slide.value>=16){
+								  saveobject.children[0].material = new THREE.MeshBasicMaterial({color:"white"});
+								  saveobject.children[1].material = new THREE.MeshBasicMaterial({color:"white"});
+								  saveobject.children[2].material = new THREE.MeshBasicMaterial({color:"white"});
+								  saveobject.children[3].material = new THREE.MeshBasicMaterial({color:"white"});
+								  saveobject.children[4].material = new THREE.MeshBasicMaterial({color:"white"});
+								  }
+								  else if (child.name === 'Column1' && slide.value<=2){
+								  
+                                  child.material = new THREE.MeshPhongMaterial({color:"green",wireframe: false,
+									opacity: 0.60,
+									transparent: true,
+									alphaTest: 0.05});
+								  
+								  }
+								  else if(child.name === 'Column2' && slide.value>=3 && slide.value<=4){
+								  
+                                  child.material = new THREE.MeshBasicMaterial({color:"green",wireframe: false,
+									opacity: 0.60,
+									transparent: true,
+									alphaTest: 0.05});
+								  
+								  }
+								  else if(child.name === 'Column3' && slide.value>=5 && slide.value<=8){
+								 
+                                  child.material = new THREE.MeshBasicMaterial({color:"green",wireframe: false,
+									opacity: 0.60,
+									transparent: true,
+									alphaTest: 0.05});
+								  
+								  }
+								  else if(child.name === 'Column4' && slide.value>=9 && slide.value<=11){
+								  
+                                  child.material = new THREE.MeshBasicMaterial({color:"green",wireframe: false,
+									opacity: 0.60,
+									transparent: true,
+									alphaTest: 0.05});	
+								 
+								  }
+								  else if(child.name === 'Slab' && slide.value>=12 && slide.value<=15){
+								 
+                                  child.material = new THREE.MeshBasicMaterial({color:"green",wireframe: false,
+									opacity: 0.60,
+									transparent: true,
+									alphaTest: 0.05});
+								  }
+								  
+                                 }
+								
+                             } );
+					  },false);
+                      var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.61 );
+                        hemiLight.position.set( 0, 50, 0 );
+                      
+                        scene.add( hemiLight );
+
+                        var dirLight = new THREE.DirectionalLight( 0xffffff, 0.54 );
+                        dirLight.position.set( -8, 12, 8 );
+                        
+                        dirLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
+                  
+                        scene.add( dirLight );
+
+                      var sliderval = document.getElementById("slider")
+                      if (sliderval> 6 ){dirLight.castShadow = true;}
+                      else {dirLight.castShadow = false;}
+						
+
+                      animate();
+                    function animate() {
+                      requestAnimationFrame(animate);
+                      renderer.render(scene,camera);
+					  
+                    }
+					
+					
+              
+                </script>
+            </div>
+			</div>
+        </div>
+    </div>
+</body>
+</html>
